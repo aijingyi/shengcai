@@ -1,0 +1,291 @@
+#!/bin/bash
+
+#########################
+#生菜自动化测试工具
+#功能：下载、安装、运行测试工具、收集测试结果
+#发送结果到指定邮箱
+#创建者：梁凯 kevinlang@sina.com
+#时间：2017-09-07
+#版本：1.0
+########################
+
+
+export SHENGCAIROOT=$(cd `dirname $0`;pwd)
+#设置接受测试结果的邮箱
+To_mail="kai.liang@i-soft.com.cn"
+
+#stream性能测试
+#发送结果到邮箱，取消注释即可
+stream()
+{
+	sh $SHENGCAIROOT/testcases/stream.sh
+	#send_mail stream    #需要发送邮件，则取消此行注释
+}
+
+#iozone性能测试
+#iozone.sh 3 64 32
+#3为测试执行次数
+#64为块大小
+#32为内存大小
+#测试之前需要创建/iotest文件
+#需要的话挂载分区到/iotest
+iozone()
+{
+	#iozone 参数1：测试次数；参数2：块大小；参数3：测试文件大小
+	sh $SHENGCAIROOT/testcases/iozone.sh 3 64 32
+	#send_mail iozone
+}
+
+#netperf性能测试（四种场景）
+#实例：netperf_s.sh 192.168.32.176 
+#192.168.32.176为服务端ip，提前设置ssh无密码访问
+netperf()
+{
+	#参数1：服务端ip地址，需提前设置ssh无密码访问
+	sh $SHENGCAIROOT/testcases/netperf.sh 192.168.32.176
+	#send_mail netperf
+}
+
+#netperf稳定性测试
+#实例：netperf_s.sh 192.168.32.176 48 600
+#192.168.32.176为服务端ip，提前设置ssh无密码访问
+#之后会自动安装netperf，开启netserver服务
+#48为测试次数，600为每次测试时间，共计8小时
+netperf_s()
+{
+	#参数1：服务端ip地址，需提前设置ssh无密码访问；参数2：测试次数；参数3：每次时间；
+	sh $SHENGCAIROOT/testcases/netperf_s.sh 192.168.32.176 48 600
+	#send_mail netperf_s
+}
+
+#lmbench性能测试
+#lmbench.sh 2048 测试内存大小内2048Mb
+#不指定则使用默认参数
+lmbench()
+{
+	#参数1：配置内存大小，不指定则使用默认
+	sh $SHENGCAIROOT/testcases/lmbench.sh 
+	#send_mail lmbench
+}
+
+#unixbench性能测试
+#需要制定测试次数和测试机器cpu数量
+#unixbench 3 8 测试三次、cpu数量为8，
+#不指定cpu数量则仅单核测试
+unixbench()
+{
+	#参数1：测试次数；参数2：cpu数量
+	sh $SHENGCAIROOT/testcases/unixbench.sh 3 8 
+	#send_mail unixbench
+}
+
+#sysbench 内存测试
+sysbenchmem()
+{
+	sh $SHENGCAIROOT/testcases/sysbench.sh mem
+	#send_mail sysbenchmem
+}
+
+#sysbench cpu测试
+sysbenchcpu()
+{
+	sh $SHENGCAIROOT/testcases/sysbench.sh cpu
+	#send_mail sysbenchcpu
+}
+
+
+#sysbench mysql测试
+sysbenchmysql()
+{
+	sh $SHENGCAIROOT/testcases/sysbench.sh mysql
+	#send_mail sysbenchmysql
+}
+
+#Spec JVM性能测试
+specjvm()
+{
+	sh $SHENGCAIROOT/testcases/specjvm.sh
+	#send_mail specjvm
+}
+
+#pingpong测试
+pingpong()
+{
+	sh $SHENGCAIROOT/testcases/pingpong.sh
+	#send_mail pingpong
+}
+
+#Apache Benchmark测试
+ab()
+{
+	sh $SHENGCAIROOT/testcases/ab.sh
+	#send_mail ab
+}
+
+#ltp内核测试
+ltpkernel()
+{
+	sh $SHENGCAIROOT/testcases/ltpkernel.sh 
+	#send_mail ltpkernel
+}
+
+#ltp压力测试
+#需要制定测试使用分区和测试时间（小时）
+#ltpstress.sh sda5 8 使用sda5分区，测试8小时
+ltpstress()
+{
+	#参数1：分区号；参数2：测试执行时间
+	#export RHOST=${RHOST:-"192.168.32.182"}
+        #export PASSWD=${PASSWD:-"abc123"}
+	sh $SHENGCAIROOT/testcases/ltpstress.sh sda5 8
+	#send_mail ltpstress
+}
+
+#ltp网络测试
+ltpnetwork()
+{
+	#export RHOST=${RHOST:-"192.168.32.182"}
+        #export PASSWD=${PASSWD:-"abc123"}
+	sh $SHENGCAIROOT/testcases/ltpnetwork.sh 
+	#send_mail ltpnetwork
+}
+
+#isoft-ltp功能测试，内核、基本系统、服务模块
+isoftltp()
+{
+	
+	sh $SHENGCAIROOT/testcases/isoftltp.sh 
+	#send_mail isoftltp
+}
+
+#运行list文件下所有的测试项（除注释以外）
+
+runlist()
+{
+	for testcase in `cat $SHENGCAIROOT/list`
+	do
+	[ ${testcase:0:1} != "#" ] &&  $testcase
+	#[ ${testcase:0:1} != "#" ] &&  echo $testcase
+	done
+
+}
+
+muban()
+{
+	sh $SHENGCAIROOT/testcases/muban.sh 
+	#send_mail muban
+}
+#收集硬件信息
+hwc()
+{
+	
+	sh $SHENGCAIROOT/testenv/hwc.sh 
+	#send_mail hwc
+}
+
+#发送结果到指定邮箱
+send_mail()
+{
+
+	python $SHENGCAIROOT/mkresults/results_mail.py "$SHENGCAIROOT/results/" $To_mail $1 
+}
+
+usage()
+{
+	echo "#####################################"
+	echo "#生菜自动化测试工具                 #"
+	echo "#                                   #"
+	echo "#仅以此工具来纪念我们逝去的青春     #"
+	echo "#####################################"
+	echo "生菜自动化测试工具"
+	echo "用法：./runtest  [测试项]"
+	echo "stream      stream测试"
+	echo "lmbench     lmbench测试"
+	echo "unixbench   unixbench测试"
+	echo "iozone      iozone测试"
+	echo "sysmem      sysbench内存性能测试"
+	echo "syscpu      sysbench cpu性能测试"
+	echo "sysmysql    sysbench mysql性能测试"
+	echo "specjvm    spec jvm性能测试"
+	echo "pingpong    pingpong性能测试"
+	echo "ab    Apache Benchmark性能测试"
+	echo "ltpkernel   ltp 内核功能测试"
+	echo "ltpstreaa   ltp压力测试"
+	echo "ltpnetwork  ltp网络功能测试"
+	echo "isoftltp    isoft-ltp功能测试"
+	echo "netperf     netperf性能测试"
+	echo "netperf_s   netperf稳定性测试"
+	echo "list list文件下的所以未注释项测试"
+	echo "例如：stream测试，./runtest stream"
+	echo "例如：stream、iozone同时测试，./runtest stream iozone"
+	echo "请向kevinlaung@sina.com 报告shengcai的错误。"
+}
+
+version()
+{
+	echo "shengcai v1.0  20170907"
+}
+main()
+{
+for i in $@
+do 
+case $i in
+	iozone)
+		iozone;;
+	stream)
+		stream;;
+	netperf)
+		netperf;;
+	netperf_s)
+		netperf_s;;
+	unixbench)
+		unixbench;;
+	lmbench)
+		lmbench;;
+	sysmem)
+		sysbenchmem;;
+	syscpu)
+		sysbenchcpu;;
+	sysmysql)
+		sysbenchmysql;;
+	specjvm)
+		specjvm;;
+	pingpong)
+		pingpong;;
+	ab)
+		ab;;
+	ltpkernel)
+		ltpkernel;;
+	ltpstress)
+		ltpstress;;
+	ltpnetwork)
+		ltpnetwork;;
+	isoftltp)
+		isoftltp;;
+	list)
+		runlist;;
+	muban)
+		muban;;
+	hwc)
+		hwc;;
+	-v)
+		version;;
+	h)
+		usage;;
+	-h)
+		usage;;
+	\?)
+		usage;;
+	*)
+		usage;;
+esac
+done
+}
+
+if [ ! -n "$1" ];then 
+	usage
+elif [ "$1" = "list" ]; then
+	runlist
+else
+	main $@
+fi

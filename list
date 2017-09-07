@@ -1,0 +1,16 @@
+stream
+#sysbenchmem
+#sysbenchcpu
+#sysbenchmysql
+#unixbench
+#lmbench
+#iozone
+#pingpong
+#specjvm
+#ab
+#netperf
+#netperf_s
+#isoftltp
+#ltpkernel
+#ltpnetwork
+#ltpstress
