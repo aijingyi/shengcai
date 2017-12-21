@@ -5,8 +5,8 @@
 #功能：下载、安装、运行测试工具、收集测试结果
 #发送结果到指定邮箱
 #创建者：梁凯 kevinlang@sina.com
-#时间：2017-09-07
-#版本：1.0
+#时间：2017-11-01
+#版本：1.1
 ########################
 
 
@@ -27,8 +27,7 @@ stream()
 #3为测试执行次数
 #64为块大小
 #32为内存大小
-#测试之前需要创建/iotest文件
-#需要的话挂载分区到/iotest
+#默认创建/iotest，需要单独分区请挂载到/iotest
 iozone()
 {
 	#iozone 参数1：测试次数；参数2：块大小；参数3：测试文件大小
@@ -69,13 +68,12 @@ lmbench()
 }
 
 #unixbench性能测试
-#需要制定测试次数和测试机器cpu数量
-#unixbench 3 8 测试三次、cpu数量为8，
-#不指定cpu数量则仅单核测试
+#需要制定测试次数
+#unixbench 3 测试三次
 unixbench()
 {
-	#参数1：测试次数；参数2：cpu数量
-	sh $SHENGCAIROOT/testcases/unixbench.sh 3 8 
+	#参数1：测试次数；
+	sh $SHENGCAIROOT/testcases/unixbench.sh 3 
 	#send_mail unixbench
 }
 
@@ -183,6 +181,13 @@ hwc()
 	#send_mail hwc
 }
 
+#系统初始化：调整系统时间等
+init()
+{
+	
+	sh $SHENGCAIROOT/testenv/init_env.sh 
+	
+}
 #发送结果到指定邮箱
 send_mail()
 {
@@ -215,6 +220,8 @@ usage()
 	echo "isoftltp    isoft-ltp功能测试"
 	echo "netperf     netperf性能测试"
 	echo "netperf_s   netperf稳定性测试"
+	echo "hwc         收集系统信息"
+	echo "init        初始化系统信息"
 	echo "list list文件下的所以未注释项测试"
 	echo "例如：stream测试，./runtest stream"
 	echo "例如：stream、iozone同时测试，./runtest stream iozone"
@@ -223,7 +230,7 @@ usage()
 
 version()
 {
-	echo "shengcai v1.0  20170907"
+	echo "shengcai v1.1  20171101"
 }
 main()
 {
@@ -268,6 +275,8 @@ case $i in
 		muban;;
 	hwc)
 		hwc;;
+	init)
+		init;;
 	-v)
 		version;;
 	h)
