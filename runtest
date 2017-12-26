@@ -12,7 +12,8 @@
 
 export SHENGCAIROOT=$(cd `dirname $0`;pwd)
 #设置接受测试结果的邮箱
-To_mail="kai.liang@i-soft.com.cn"
+To_mail=""
+#To_mail="kai.liang@i-soft.com.cn"
 
 #stream性能测试
 #发送结果到邮箱，取消注释即可
