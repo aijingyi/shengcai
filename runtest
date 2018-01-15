@@ -5,8 +5,8 @@
 #功能：下载、安装、运行测试工具、收集测试结果
 #发送结果到指定邮箱
 #创建者：梁凯 kevinlang@sina.com
-#时间：2017-11-01
-#版本：1.1
+#时间：2018-01-15
+#版本：1.2
 ########################
 
 
@@ -32,7 +32,7 @@ stream()
 iozone()
 {
 	#iozone 参数1：测试次数；参数2：块大小；参数3：测试文件大小
-	sh $SHENGCAIROOT/testcases/iozone.sh 3 64 32
+	sh $SHENGCAIROOT/testcases/iozone.sh 3 32 4
 	#send_mail iozone
 }
 
@@ -42,7 +42,7 @@ iozone()
 netperf()
 {
 	#参数1：服务端ip地址，需提前设置ssh无密码访问
-	sh $SHENGCAIROOT/testcases/netperf.sh 192.168.32.176
+	sh $SHENGCAIROOT/testcases/netperf.sh 192.168.32.182
 	#send_mail netperf
 }
 
@@ -117,7 +117,7 @@ pingpong()
 #Apache Benchmark测试
 ab()
 {
-	sh $SHENGCAIROOT/testcases/ab.sh
+	sh $SHENGCAIROOT/testcases/ab.sh 192.168.32.182
 	#send_mail ab
 }
 
