@@ -12,6 +12,7 @@ setup()
 	[ -d "$prog" ] || mkdir $prog
 
 	HOST=`hostname`
+	ntpdate ntp.api.bz >/dev/null
 	results="$SHENGCAIROOT/results"
 	[ -d "$results" ] || mkdir $results
 	

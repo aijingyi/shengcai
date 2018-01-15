@@ -33,7 +33,8 @@ do_setup()
 		if [ ! -e netperf-2.7.0/src/netperf ];then
 		tar zxf netperf-2.7.0.tar.gz
 		cd /opt/netperf-2.7.0 
-		if [ `arch` == 'mips64el' ]; then
+		
+		if [ $(arch) == 'mips64el' ]; then
         		./configure --build=mips64 >>/dev/null
 		else
 			./configure >>/dev/null
@@ -64,7 +65,7 @@ do_test()
 	for para in TCP_STREAM UDP_STREAM TCP_RR TCP_CRR
 	do		
 		log "$para test ..."
-		for i in `seq 3`
+		for i in `seq 4`
 		do 
 		$prog/netperf-2.7.0/src/netperf -t $para -H $1 -l 60 >> $results/netperf/$para
 		sleep 10
